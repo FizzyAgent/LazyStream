@@ -1,4 +1,5 @@
 import concurrent.futures
+import copy
 from typing import Callable, Generic, Iterator, TypeVar, Optional
 
 A = TypeVar("A")
@@ -67,6 +68,14 @@ class LazyStream(Generic[A]):
             except StopIteration:
                 break
         return output
+
+    def reduce(
+        self, func: Callable[[B, A], B], accum: B, limit: Optional[int] = None
+    ) -> B:
+        accum = copy.deepcopy(accum)
+        for value in self.__safe_iter(limit):
+            accum = func(accum, value)
+        return accum
 
     def map(self, func: Callable[[A], B]) -> "LazyStream[B]":
         return LazyStream(lambda: func(self.__safe_next()))
