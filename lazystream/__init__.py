@@ -1,6 +1,6 @@
 import concurrent.futures
 import copy
-from typing import Callable, Generic, Iterator, TypeVar, Optional
+from typing import Callable, Generic, Iterator, TypeVar, Optional, List
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -49,19 +49,19 @@ class LazyStream(Generic[A]):
     def from_iterator(iterator: Iterator[A]) -> "LazyStream[A]":
         return LazyStream(lambda: next(iterator))
 
-    def evaluate(self, limit: Optional[int] = None) -> list[A]:
-        output: list[A] = []
+    def evaluate(self, limit: Optional[int] = None) -> List[A]:
+        output: List[A] = []
         for value in self.__safe_iter(limit):
             output.append(value)
         return output
 
     def par_evaluate(
         self, limit: int, executor: concurrent.futures.Executor
-    ) -> list[A]:
-        futures: list[concurrent.futures._base.Future[A]] = []
+    ) -> List[A]:
+        futures: List[concurrent.futures._base.Future[A]] = []
         while len(futures) < limit:
             futures.append(executor.submit(self._generator))
-        output: list[A] = []
+        output: List[A] = []
         for future in futures:
             try:
                 output.append(future.result())
