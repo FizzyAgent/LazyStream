@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lazystream"
+version = "0.1.0"
+description = "Scala-inspired stream for lazy evaluation"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT License"}
+authors = [{name = "Tan Pinxi", email = "tpinxi@gmail.com"}]
+keywords = ["stream", "lazy", "functional"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Repository = "https://github.com/FizzyAgent/lazystream"
+
