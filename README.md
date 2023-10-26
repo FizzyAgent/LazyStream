@@ -24,7 +24,7 @@ Lazy Stream is very easy to use. You can create a stream from any function or it
 from lazystream import LazyStream
 
 # Finite stream from iterator
-incremental_stream = LazyStream.from_iterator(range(5))
+incremental_stream = LazyStream.from_iterator(iter(range(5)))
 incremental_stream.evaluate()
 # [0, 1, 2, 3, 4]
 
@@ -59,7 +59,7 @@ You can chain operations on streams, which will be evaluated lazily. Classic str
 ```python
 from lazystream import LazyStream
 
-stream = LazyStream.from_iterator(range(10))
+stream = LazyStream.from_iterator(iter(range(10)))
 stream.filter(lambda x: x % 2 == 0).map(lambda x: x * 2).evaluate()
 # [0, 4, 8, 12, 16]
 ```
@@ -83,7 +83,7 @@ import random
 from lazystream import LazyStream
 
 # Iterate on a finite stream
-finite_stream = LazyStream.from_iterator(range(10))
+finite_stream = LazyStream.from_iterator(iter(range(10)))
 for x in finite_stream:
     print(x)
 
@@ -101,7 +101,7 @@ In addition, the `reduce` operation is supported, which allows you to obtain a s
 from lazystream import LazyStream
 
 # Reduce on a finite stream
-stream = LazyStream.from_iterator(range(10))
+stream = LazyStream.from_iterator(iter(range(10)))
 stream.reduce(lambda x, y: x + y, accum=0)
 # 45
 
@@ -125,7 +125,7 @@ def io_bound_function(x):
     # Do some IO-bound operation
     return x
 
-stream = LazyStream.from_iterator(range(10))
+stream = LazyStream.from_iterator(iter(range(10)))
 stream.par_map(
     io_bound_function, executor=ThreadPoolExecutor(4)
 ).evaluate()
