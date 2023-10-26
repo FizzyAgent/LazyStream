@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lazystream"
-version = "0.1.1"
+version = "0.1.2"
 description = "Scala-inspired stream for lazy evaluation"
 readme = "README.md"
 requires-python = ">=3.6"
