@@ -116,3 +116,18 @@ def test_filter():
     # Should raise an error when called
     with pytest.raises(NotImplementedError):
         error_filtered.evaluate(10)
+
+
+def test_zip():
+    x = 1
+    s1 = LazyStream.from_iterator(iter(range(100)))
+    s2 = LazyStream.from_lambda(lambda: x)
+    zipped = s1.zip(s2)
+
+    # Test finite evaluation
+    assert zipped.evaluate(10) == list(zip(range(10), [1] * 10))
+    # Test laziness
+    x = 2
+    assert zipped.evaluate(10) == list(zip(range(10, 20), [2] * 10))
+    # Test zipping finite and infinite streams
+    assert zipped.evaluate()[-1] == (99, 2)
