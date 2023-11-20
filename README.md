@@ -1,5 +1,8 @@
 # Lazy Stream
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+
 Lazy Stream is a library for lazy evaluation in Python, inspired by the Scala Stream class.
 
 Lazy Stream allows you to store and chain operations on a finite or infinite sequence of values. The final result will only be computed when needed, for better memory and performance over conventional Python lists.
