@@ -1,7 +1,7 @@
 import concurrent.futures
 import copy
 import random
-from typing import Callable, Generic, Iterator, TypeVar, Optional, List, Tuple
+from typing import Callable, Generic, Iterator, List, Optional, Tuple, TypeVar
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -104,6 +104,7 @@ class LazyStream(Generic[A]):
         """
         Apply func to each element in the stream with its index
         """
+
         def iterator() -> Iterator[B]:
             for i, value in enumerate(self.__safe_iter()):
                 yield func(i, value)
@@ -122,6 +123,7 @@ class LazyStream(Generic[A]):
         """
         Filter the stream by predicate
         """
+
         def iterator() -> Iterator[A]:
             for value in self.__safe_iter():
                 if predicate(value):
@@ -133,6 +135,7 @@ class LazyStream(Generic[A]):
         """
         Apply func to each element in the stream without changing the stream
         """
+
         def iterator() -> Iterator[A]:
             for value in self.__safe_iter():
                 func(value)
@@ -154,6 +157,7 @@ class LazyStream(Generic[A]):
         Sample the stream with probability p
         Returns empty stream if p <= 0 and full stream if p >= 1
         """
+
         def iterator() -> Iterator[A]:
             for value in self.__safe_iter():
                 if random.random() < p:

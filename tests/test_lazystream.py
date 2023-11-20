@@ -5,7 +5,6 @@ import pytest
 
 from lazystream import LazyStream
 
-
 THREADPOOL = ThreadPoolExecutor(4)
 
 
