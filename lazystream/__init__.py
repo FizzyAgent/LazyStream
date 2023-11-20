@@ -1,5 +1,6 @@
 import concurrent.futures
 import copy
+import random
 from typing import Callable, Generic, Iterator, TypeVar, Optional, List, Tuple
 
 A = TypeVar("A")
@@ -109,4 +110,14 @@ class LazyStream(Generic[A]):
         return LazyStream.from_iterator(iterator())
 
     def zip(self, other: "LazyStream[B]") -> "LazyStream[Tuple[A, B]]":
-        return LazyStream.from_iterator(iter(zip(self.__safe_iter(), other.__safe_iter())))
+        return LazyStream.from_iterator(
+            iter(zip(self.__safe_iter(), other.__safe_iter()))
+        )
+
+    def sample(self, p: float) -> "LazyStream[A]":
+        def iterator() -> Iterator[A]:
+            for value in self.__safe_iter():
+                if random.random() < p:
+                    yield value
+
+        return LazyStream.from_iterator(iterator())
