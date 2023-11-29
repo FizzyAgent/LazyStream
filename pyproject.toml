@@ -1,15 +1,12 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool]
+[tool.poetry]
 name = "lazystream"
 version = "0.1.3"
 description = "Scala-inspired stream for lazy evaluation"
+license = "MIT"
+authors = ["Tan Pinxi <tpinxi@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.6"
-license = {text = "MIT License"}
-authors = [{name = "Tan Pinxi", email = "tpinxi@gmail.com"}]
+repository = "https://github.com/FizzyAgent/lazystream"
 keywords = ["stream", "lazy", "functional"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -18,7 +15,11 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
 ]
+packages = [{ include = "lazystream" }]
 
-[project.urls]
-Repository = "https://github.com/FizzyAgent/lazystream"
+[tool.poetry.dependencies]
+python = "^3.6"
 
+[build-system]
+requires = ["poetry-core", "twine"]
+build-backend = "poetry.core.masonry.api"
