@@ -1,5 +1,6 @@
 import random
 from concurrent.futures import ThreadPoolExecutor
+from typing import List
 
 import pytest
 
@@ -101,6 +102,18 @@ def test_map():
         error_mapped.evaluate(10)
 
 
+def test_flatten():
+    x: List[int] = []
+
+    def gen() -> List[int]:
+        x.append(len(x))
+        return x
+
+    stream = LazyStream.from_lambda(gen)
+    flattened = stream.flatten()
+    assert flattened.evaluate(10) == [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
+
+
 def test_filter():
     stream = LazyStream.from_lambda(lambda: random.randint(0, 1))
 
@@ -115,6 +128,24 @@ def test_filter():
     # Should raise an error when called
     with pytest.raises(NotImplementedError):
         error_filtered.evaluate(10)
+
+
+def test_flatten_option():
+    stream = LazyStream.from_lambda(lambda: random.choice((None, 1)))
+    flattened = stream.flatten_option()
+    assert flattened.evaluate(10) == [1] * 10
+
+
+def test_distinct():
+    stream = LazyStream.from_lambda(lambda: random.randint(0, 1))
+    distinct = stream.distinct().evaluate(2)
+    assert len(distinct) == 2
+    assert set(distinct) == {0, 1}
+
+    stream = LazyStream.from_lambda(lambda: random.randint(0, 4))
+    distinct = stream.distinct_by(lambda x: x % 2).evaluate(2)
+    assert len(distinct) == 2
+    assert set([x % 2 for x in distinct]) == {0, 1}
 
 
 def test_zip():

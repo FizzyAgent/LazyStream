@@ -1,10 +1,22 @@
 import concurrent.futures
 import copy
 import random
-from typing import Callable, Generic, Iterator, List, Optional, Tuple, TypeVar
+from typing import (
+    Callable,
+    Generic,
+    Hashable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypeVar,
+)
 
 A = TypeVar("A")
 B = TypeVar("B")
+CanHash = TypeVar("CanHash", bound=Hashable)
 
 
 class LazyStream(Generic[A]):
@@ -119,6 +131,18 @@ class LazyStream(Generic[A]):
         """
         return LazyStream(lambda: executor.submit(func, self.__safe_next()).result())
 
+    def flatten(self: "LazyStream[Sequence[A]]") -> "LazyStream[A]":
+        """
+        Flatten the stream of sequences
+        """
+
+        def iterator() -> Iterator[A]:
+            for value in self.__safe_iter():
+                for v in value:
+                    yield v
+
+        return LazyStream.from_iterator(iterator())
+
     def filter(self, predicate: Callable[[A], bool]) -> "LazyStream[A]":
         """
         Filter the stream by predicate
@@ -130,6 +154,31 @@ class LazyStream(Generic[A]):
                     yield value
 
         return LazyStream.from_iterator(iterator())
+
+    def flatten_option(self: "LazyStream[Optional[A]]") -> "LazyStream[A]":
+        """
+        Flatten the stream of optional values
+        """
+        return self.filter(lambda x: x is not None)
+
+    def distinct(self: "LazyStream[CanHash]") -> "LazyStream[CanHash]":
+        """
+        Remove duplicate elements from the stream
+        """
+        seen: Set[CanHash] = set()
+        return self.filter(lambda x: x not in seen and not seen.add(x))
+
+    def distinct_by(self, key: Callable[[A], CanHash]) -> "LazyStream[A]":
+        """
+        Remove duplicate elements from the stream by key
+        """
+        seen: Set[CanHash] = set()
+        return (
+            # Store the key and element to avoid calling key() twice
+            self.map(lambda x: (key(x), x))
+            .filter(lambda x: x[0] not in seen and not seen.add(x[0]))
+            .map(lambda x: x[1])
+        )
 
     def for_each(self, func: Callable[[A], None]) -> "LazyStream[A]":
         """
