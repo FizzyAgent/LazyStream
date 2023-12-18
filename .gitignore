@@ -1,5 +1,6 @@
 .idea
 .mypy_cache
+.dmypy.json
 __pycache__
 dist
 *.egg-info

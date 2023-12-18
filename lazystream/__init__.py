@@ -159,14 +159,20 @@ class LazyStream(Generic[A]):
         """
         Flatten the stream of optional values
         """
-        return self.filter(lambda x: x is not None)
+
+        def iterator() -> Iterator[A]:
+            for value in self.__safe_iter():
+                if value is not None:
+                    yield value
+
+        return LazyStream.from_iterator(iterator())
 
     def distinct(self: "LazyStream[CanHash]") -> "LazyStream[CanHash]":
         """
         Remove duplicate elements from the stream
         """
         seen: Set[CanHash] = set()
-        return self.filter(lambda x: x not in seen and not seen.add(x))
+        return self.filter(lambda x: x not in seen and not seen.add(x))  # type: ignore[func-returns-value]
 
     def distinct_by(self, key: Callable[[A], CanHash]) -> "LazyStream[A]":
         """
@@ -176,7 +182,7 @@ class LazyStream(Generic[A]):
         return (
             # Store the key and element to avoid calling key() twice
             self.map(lambda x: (key(x), x))
-            .filter(lambda x: x[0] not in seen and not seen.add(x[0]))
+            .filter(lambda x: x[0] not in seen and not seen.add(x[0]))  # type: ignore[func-returns-value]
             .map(lambda x: x[1])
         )
 
