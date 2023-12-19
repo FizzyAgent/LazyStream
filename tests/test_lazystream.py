@@ -136,6 +136,51 @@ def test_flatten_option():
     assert flattened.evaluate(10) == [1] * 10
 
 
+def test_catch():
+    def error_func(x: int) -> int:
+        if x % 4 == 0:
+            return x
+        elif x % 4 == 1:
+            raise ValueError()
+        elif x % 4 == 2:
+            raise NotImplementedError()
+        else:
+            raise OSError()
+
+    error_stream = LazyStream.from_iterator(iter(range(100))).map(error_func)
+
+    catch_value = error_stream.catch(ValueError)
+    for _ in range(3):
+        assert next(catch_value) % 4 == 0
+        assert next(catch_value) is None
+        with pytest.raises(NotImplementedError):
+            next(catch_value)
+        with pytest.raises(OSError):
+            next(catch_value)
+
+    catch_2 = error_stream.catch((ValueError, OSError))
+    for _ in range(3):
+        assert next(catch_2) % 4 == 0
+        assert next(catch_2) is None
+        with pytest.raises(NotImplementedError):
+            next(catch_2)
+        assert next(catch_2) is None
+
+    catch_all = error_stream.catch((ValueError, NotImplementedError, OSError))
+    for _ in range(3):
+        assert next(catch_all) % 4 == 0
+        assert next(catch_all) is None
+        assert next(catch_all) is None
+        assert next(catch_all) is None
+
+    catch_base = error_stream.catch(Exception)
+    for _ in range(3):
+        assert next(catch_base) % 4 == 0
+        assert next(catch_base) is None
+        assert next(catch_base) is None
+        assert next(catch_base) is None
+
+
 def test_distinct():
     stream = LazyStream.from_lambda(lambda: random.randint(0, 1))
     distinct = stream.distinct().evaluate(2)

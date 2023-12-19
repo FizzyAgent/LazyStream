@@ -11,7 +11,9 @@ from typing import (
     Sequence,
     Set,
     Tuple,
+    Type,
     TypeVar,
+    Union,
 )
 
 A = TypeVar("A")
@@ -166,6 +168,21 @@ class LazyStream(Generic[A]):
                     yield value
 
         return LazyStream.from_iterator(iterator())
+
+    def catch(
+        self, exception: Union[Type[Exception], Tuple[Type[Exception], ...]]
+    ) -> "LazyStream[Optional[A]]":
+        """
+        Catch given exception(s) and return None
+        """
+
+        def func() -> Optional[A]:
+            try:
+                return self._generator()
+            except exception:
+                return None
+
+        return LazyStream.from_lambda(func)
 
     def distinct(self: "LazyStream[CanHash]") -> "LazyStream[CanHash]":
         """
