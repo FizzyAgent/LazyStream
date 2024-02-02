@@ -1,5 +1,6 @@
 import concurrent.futures
 import copy
+import itertools
 import random
 from typing import (
     Callable,
@@ -107,6 +108,13 @@ class LazyStream(Generic[A]):
         for value in self.__safe_iter(limit):
             accum = func(accum, value)
         return accum
+
+    def limit(self, n: int) -> "LazyStream[A]":
+        """
+        Limit the number of elements in the stream
+        """
+
+        return LazyStream.from_iterator(self.__safe_iter(n))
 
     def map(self, func: Callable[[A], B]) -> "LazyStream[B]":
         """
@@ -222,6 +230,15 @@ class LazyStream(Generic[A]):
         """
         return LazyStream.from_iterator(
             iter(zip(self.__safe_iter(), other.__safe_iter()))
+        )
+
+    def chain(self, other: "LazyStream[B]") -> "LazyStream[Union[A, B]]":
+        """
+        Chain two streams together, so that the second stream starts when the first one ends
+        Note that the first stream should be finite for this function to make sense
+        """
+        return LazyStream.from_iterator(
+            itertools.chain(self.__safe_iter(), other.__safe_iter())
         )
 
     def sample(self, p: float) -> "LazyStream[A]":

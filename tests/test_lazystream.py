@@ -9,7 +9,7 @@ from lazystream import LazyStream
 THREADPOOL = ThreadPoolExecutor(4)
 
 
-def test_laziness():
+def test_laziness() -> None:
     """
     Test that the generator is only called when needed
     """
@@ -22,7 +22,7 @@ def test_laziness():
             assert next(stream) == x
 
 
-def test_iterate():
+def test_iterate() -> None:
     stream = LazyStream.from_iterator(iter(range(20)))
     i = 0
     x = 0
@@ -31,7 +31,7 @@ def test_iterate():
     assert x == i == 19
 
 
-def test_next():
+def test_next() -> None:
     stream = LazyStream.from_iterator(iter(range(20)))
     for i in range(20):
         x = next(stream)
@@ -41,7 +41,7 @@ def test_next():
         next(stream)
 
 
-def test_evaluate():
+def test_evaluate() -> None:
     stream = LazyStream.from_iterator(iter(range(20)))
     # evaluate should return a list of the first 10 elements
     res = stream.evaluate(10)
@@ -63,7 +63,7 @@ def test_evaluate():
     assert res == []
 
 
-def test_reduce():
+def test_reduce() -> None:
     stream = LazyStream.from_iterator(iter(range(100)))
 
     res = stream.reduce(func=lambda x, y: x + y, accum=0, limit=10)
@@ -76,7 +76,7 @@ def test_reduce():
     assert res == sum(range(40, 90))
 
 
-def test_map():
+def test_map() -> None:
     stream = LazyStream.from_iterator(iter(range(50)))
 
     mapped = stream.map(lambda x: x + 1)
@@ -102,7 +102,7 @@ def test_map():
         error_mapped.evaluate(10)
 
 
-def test_flatten():
+def test_flatten() -> None:
     x: List[int] = []
 
     def gen() -> List[int]:
@@ -114,7 +114,7 @@ def test_flatten():
     assert flattened.evaluate(10) == [0, 0, 1, 0, 1, 2, 0, 1, 2, 3]
 
 
-def test_filter():
+def test_filter() -> None:
     stream = LazyStream.from_lambda(lambda: random.randint(0, 1))
 
     filtered = stream.filter(lambda x: x > 0)
@@ -130,13 +130,13 @@ def test_filter():
         error_filtered.evaluate(10)
 
 
-def test_flatten_option():
+def test_flatten_option() -> None:
     stream = LazyStream.from_lambda(lambda: random.choice((None, 1)))
     flattened = stream.flatten_option()
     assert flattened.evaluate(10) == [1] * 10
 
 
-def test_catch():
+def test_catch() -> None:
     def error_func(x: int) -> int:
         if x % 4 == 0:
             return x
@@ -181,7 +181,7 @@ def test_catch():
         assert next(catch_base) is None
 
 
-def test_distinct():
+def test_distinct() -> None:
     stream = LazyStream.from_lambda(lambda: random.randint(0, 1))
     distinct = stream.distinct().evaluate(2)
     assert len(distinct) == 2
@@ -193,7 +193,14 @@ def test_distinct():
     assert set([x % 2 for x in distinct]) == {0, 1}
 
 
-def test_zip():
+def test_chain() -> None:
+    s1 = LazyStream.from_iterator(iter(range(10)))
+    s2 = LazyStream.from_iterator(iter(range(10, 20)))
+    chained = s1.chain(s2)
+    assert chained.evaluate() == list(range(20))
+
+
+def test_zip() -> None:
     x = 1
     s1 = LazyStream.from_iterator(iter(range(100)))
     s2 = LazyStream.from_lambda(lambda: x)

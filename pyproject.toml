@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "lazystream"
-version = "0.1.5"
+version = "0.1.6"
 description = "Scala-inspired stream for lazy evaluation"
 license = "MIT"
 authors = ["Tan Pinxi <tpinxi@gmail.com>"]
